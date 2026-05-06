@@ -1,0 +1,26 @@
+#prueba {
+  background-color: red;
+  height: 10rem;
+  width: 10rem;
+}
+
+.dos {
+  background-color: blue;
+  height: 10rem;
+  width: 10rem;
+}
+
+[data-estado="activado"] {
+  background-color: green;
+  color: white;
+}
+
+[contenteditable="true"] {
+  border: 2px dashed #ccc;
+  padding: 1rem;
+}
+
+[contenteditable="true"]:focus {
+  border-color: blue;
+  outline: none;
+}
