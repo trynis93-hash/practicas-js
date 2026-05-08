@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="contenedor">
+      <h2>sistema de acceso</h2>
+      <label for="edad">edad del aprendiz</label>
+      <input type="number" id="edad" placeholder="ingrese edad" />
+      <label>
+        <input type="checkbox" id="cuentaactiva" />¿cuenta activa?
+      </label>
+      <label> <input type="checkbox" id="baneado" />¿esta baneado? </label>
+      <button onclick="validaringreso()">vereficar estado</button>
+      <div id="mensaje" class="cuadro-mensaje">esperando validacion...</div>
+    </div>
+    <script src="if.js"></script>
+  </body>
+</html>
