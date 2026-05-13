@@ -7,18 +7,41 @@
     <link rel="stylesheet" href="css/if-swith.css" />
   </head>
   <body>
-    <h2>mi calculadora js</h2>
-    <input type="number" id="num1" placeholder="numero 1" />
-    <select id="operacion">
-      <option value="suma">+</option>
-      <option value="resta">-</option>
-      <option value="multiplicacion">*</option>
-      <option value="division">/</option>
-    </select>
-    <input type="number" id="num2" placeholder="numero 2" />
-    <button onclick="calcular()">Calcular</button>
-    <p><strong>Resultado:</strong><span id="resultado">0</span></p>
-    <div id="resultado"></div>
+    <div class="card calc-original">
+      <h2>mi calculadora js</h2>
+      <input type="number" id="num1" placeholder="numero 1" />
+      <select id="operacion">
+        <option value="suma">+</option>
+        <option value="resta">-</option>
+        <option value="multiplicacion">*</option>
+        <option value="division">/</option>
+      </select>
+      <input type="number" id="num2" placeholder="numero 2" />
+      <button onclick="calcular()">Calcular</button>
+      <p><strong>Resultado: </strong></p>
+      <div id="resultado"></div>
+    </div>
+    <div class="card calc-pro">
+      <h2>mi calculadora js <span class="badge">Pro</span></h2>
+      <div class="pro-row">
+        <input type="number" id="pro-num1" placeholder="numero 1" />
+        <select id="pro-operacion" onchange="togglesegundoNumero()">
+          <option value="suma">+ suma</option>
+          <option value="resta">- resta</option>
+          <option value="multiplicacion">* multiplicacon</option>
+          <option value="division">/ division</option>
+          <option value="potencia">^ potencia</option>
+          <option value="modulo">% modulo</option>
+          <option value="raiz">√ raiz</option>
+        </select>
+        <input type="number" id="pro-num2" placeholder="numero 2" />
+        <button onclick="calcularpro()">= Calcular</button>
+        <div class="pro-resultado-box" id="pro-resultado">-</div>
+        <p class="pro-historial-titulo">ultimas operaciones</p>
+        <ul class="pro-historial"></ul>
+        <p class="pro-hint">tambien puedes presionar Enter para calcular</p>
+      </div>
+    </div>
     <script src="js/if-swith.js"></script>
   </body>
 </html>
