@@ -8,107 +8,103 @@
   </head>
   <body>
     <h1>venta de ticket para el mundial</h1>
+    <p class="subtitle">adquiere tus entradas para los partidos del mundial</p>
     <div class="layout">
       <div class="panel">
         <div class="panel-header">comprar ticket</div>
         <div class="form-body">
-          <div class="row-1">
-            <div class="field">
-              <label>nombre del comprador</label>
-              <input type="text" id="inp-nombre" placeholder="EJ: juan perez" />
-              <span class="field-error" id="err-nombre"></span>
-            </div>
-            <div class="field">
-              <label>fecha del partido</label>
-              <input type="date" id="inp-fecha" />
-              <span class="field-error" id="err-fecha"></span>
-            </div>
+          <div class="field">
+            <label for="inp-nombre">nombre del comprador</label>
+            <input
+              type="text"
+              id="inp-nombre"
+              placeholder="EJ: juan perez"
+              autocomplete="name"
+            />
+            <span class="field-error" id="err-nombre"></span>
           </div>
-          <div class="row-1">
-            <div class="field">
-              <label>partidos del mundial</label>
-              <select id="inp-partido">
-                <option value="">selecciona un partido</option>
-                <option value="argentina vs brasil">argentina vs brasil</option>
-                <option value="alemania vs francia">alemania vs francia</option>
-                <option value="españa vs italia">españa vs italia</option>
-              </select>
-            </div>
+          <div class="field">
+            <label for="inp-fecha">fecha del partido</label>
+            <input type="date" id="inp-fecha" />
+            <span class="field-error" id="err-fecha"></span>
           </div>
-          <div class="row-1">
-            <div class="field">
-              <label>precio del ticket ($)</label>
-              <select name="precio" id="inp-precio">
-                <option value="">selecciona un precio</option>
-                <option value="50">1.000.000</option>
-                <option value="100">5.000.000</option>
-                <option value="150">10.000.000</option>
-              </select>
-              <span class="field-error" id="err-precio"></span>
-            </div>
+          <div class="field">
+            <label for="inp-partido">partidos del mundial</label>
+            <select id="inp-partido">
+              <option value="">selecciona un partido</option>
+              <option value="argentina vs brasil">argentina vs brasil</option>
+              <option value="alemania vs francia">alemania vs francia</option>
+              <option value="españa vs italia">españa vs italia</option>
+            </select>
+            <span class="field-error" id="err-partido"></span>
           </div>
-          <div class="row-1">
-            <div class="field">
-              <label>cantidad de tickets</label>
-              <input
-                type="number"
-                id="inp-cantidad"
-                min="1"
-                step="1"
-                placeholder="1"
-              />
-              <span class="field-error" id="err-cantidad"></span>
-            </div>
+          <div class="field">
+            <label for="inp-precio">precio del ticket ($)</label>
+            <select id="inp-precio">
+              <option value="">selecciona un precio</option>
+              <option value="50">1.000.000</option>
+              <option value="100">5.000.000</option>
+              <option value="150">10.000.000</option>
+            </select>
+            <span class="field-error" id="err-precio"></span>
           </div>
-          <div class="row-1">
-            <label>horarios de los partidos</label>
-            <select name="horario" id="inp-horario">
+          <div class="field">
+            <label for="inp-cantidad">cantidad de tickets</label>
+            <input
+              type="number"
+              id="inp-cantidad"
+              min="1"
+              step="1"
+              placeholder="1"
+            />
+            <span class="field-error" id="err-cantidad"></span>
+          </div>
+          <div class="field">
+            <label for="inp-horario">horarios de los partidos</label>
+            <select id="inp-horario">
               <option value="">selecciona un horario</option>
               <option value="14:00">14:00-17:00</option>
               <option value="18:00">18:00-21:00</option>
               <option value="22:00">22:00-01:00</option>
             </select>
           </div>
-          <div class="row-1">
-            <div class="estadio">
-            <label>estadio</label>
-            <select name="estadio" id="inp-estadio">
+          <div class="field">
+            <label for="inp-estadio">estadio</label>
+            <select id="inp-estadio">
               <option value="">selecciona un estadio</option>
               <option value="estadio 1">estadio EE.UU</option>
               <option value="estadio 2">estadio brazil</option>
               <option value="estadio 3">estadio mexico</option>
             </select>
           </div>
+          <div class="field">
+            <label for="inp-pago">metodo de pago</label>
+            <select name="pago" id="inp-pago">
+              <option value="">selecciona un metodo de pago</option>
+              <option value="tarjeta">tarjeta de credito</option>
+              <option value="paypal">paypal</option>
+              <option value="efectivo">efectivo</option>
+            </select>
           </div>
-          <div class="row-1">
-            <div class="field">
-              <label>metodo de pago</label>
-              <select name="pago" id="inp-pago">
-                <option value="">selecciona un metodo de pago</option>
-                <option value="tarjeta">tarjeta de credito</option>
-                <option value="paypal">paypal</option>
-                <option value="efectivo">efectivo</option>
-              </select>
-            </div>
-          </div>
-          <div class="row-1">
-            <div class="field">
-              <label>correo electronico</label>
-              <input
-                type="email"
-                id="inp-email"
-                placeholder="EJ: juan@perez.com"
-              />
-            </div>
+          <div class="field">
+            <label for="inp-email">correo electronico</label>
+            <span class="optional">(opcional)</span>
+            <input
+              type="email"
+              id="inp-email"
+              placeholder="EJ: juan@perez.com"
+              autocomplete="email"
+            />
+            <span class="field-error" id="err-email"></span>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="handleComprar()">
-            comprar ticket
-          </button>
       </div>
-      </div>
-      <div id="ticket-container"></div>
     </div>
+    <butto class="btn btn-primary" onclick="handleComprar()">
+      comprar ticket
+    </butto>
+    <div id="ticket-container"></div>
+    <div id="toast" class="toast"></div>
     <script src="../js/ticket.js"></script>
   </body>
 </html>

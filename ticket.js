@@ -1,120 +1,356 @@
-//local storage: guardar el ticket en local storage
+let tickets = [];
+let tickets = 0;
+
+//*ayuda//
+const val = (id) => document.getElementById(id)?.value ?? "";
+
+//?local storage//
 function guardarEstado() {
-  localStorage.setItem("ticket", JSON.stringify(ticket));
-  localStorage.setItem("cantidad", total);
-  localStorage.setItem("fecha", fechaDelPartido);
+  localStorage.setItem("tickets_mundial", JSON.stringify(tickets));
+  localStorage.setItem("total_mundial", JSON.stringify(total));
 }
 
 function cargarEstado() {
-  const ticketGuardado = localStorage.getItem("ticket");
-  const cantidadGuardada = localStorage.getItem("cantidad");
-  const fechaGuardada = localStorage.getItem("fecha");
-  if (ticketGuardado) ticket = JSON.parse(ticketGuardado);
-  if (cantidadGuardada) total = parseFloat(cantidadGuardada);
-  if (fechaGuardada) fechaDelPartido = JSON.parse(fechaGuardada);
+  const ticketsGuardados = localStorage.getItem("tickets_mundial");
+  const totalGuardado = localStorage.getItem("total_mundial");
+
+  if (ticketsGuardados) {
+    try {
+      tickets = JSON.parse(ticketsGuardados);
+    } catch {
+      tickets = [];
+    }
+  }
+  if (totalGuardado) total = parseFloat(totalGuardado) || 0;
 }
 
-//manejo de errores de campos del formulario
-function mostrarError(id, msg) {
-  [
-    "err-nombre",
-    "err-fecha",
-    "err-horario",
-    "err-partido",
-    "err-precio",
-    "err-cantidad",
-  ].forEach((id) => {
-    document.getElementById(id).classList.remove("input-error");
-    document.getElementById("err-" + id.split("-")[1]).textContent = "";
+//!ERRORES//
+const CAMPOS_ERROR = [
+  "err-nombre",
+  "err-fecha",
+  "err-horario",
+  "err-partido",
+  "err-precio",
+  "err-cantidad",
+  "err-estadio",
+  "err-pago",
+  "err-email",
+];
+
+function limpiarErrores() {
+  CAMPOS_ERROR.forEach((id) => {
+    const span = document.getElementById(id);
+    if (span) span.textContent = "";
   });
 }
 
-//formulario llenado
+function mostrarError(id, msg) {
+  const span = document.getElementById(id);
+  if (span) span.textContent = msg;
+}
+
+//?toast//
+let toastTimeout;
+function showToast(msg, tipo = "exito") {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  clearTimeout(toastTimeout);
+  toast.textContent = msg;
+  toast.className = `toast toast-${tipo} show`;
+  toastTimeout = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+//*formato//
+function formatPrecio(valor) {
+  return "$" + number(valor).toLocaleString("es-CO");
+}
+
+//*CONSTRUCTORES DOM//
+function crearDetalle(icono, texto) {
+  const div = document.createElement("div");
+  div.className = "ticket-detail";
+
+  const icon = document.createElement("span");
+  icon.className = "ticket-icon";
+  icon.textContent = icono;
+
+  div.appendChild(icon);
+  div.appendChild(texto);
+
+  return div;
+}
+
+function crearSubtotal(t) {
+  const div = document.createElement("div");
+  div.className = "ticket-deatil ticket-subtotal";
+
+  const icon = document.createElement("span");
+  icon.className = "detail-icon";
+  icon.textContent = "💰";
+
+  const strong = document.createElement("strong");
+  strong.textContent = formatPrecio(t.precio * t.cantidad);
+
+  div.appendChild(icon);
+  div.appendChild(`${t.cantidad} ticket(s) x ${formatPrecio(t.precio)} = `);
+  div.appendChild(strong);
+
+  return div;
+}
+
+//*tarjeta//
+function crearItemTicket(t) {
+  const item = document.createElement("div");
+  item.className = "ticket-item";
+  item.id = `ticket-${t.id}`;
+
+  //?encabezado//
+  const headerRow = document.createElement("div");
+  headerRow.className = "ticket-header-row";
+  const spanPartido = document.createElement("span");
+  spanPartido.className = "ticket-partido";
+  spanPartido.textContent = t.partido;
+
+  const btnEleminar = document.createElement("button");
+  btnEleminar.className = "btn-eliminar";
+  btnEleminar.textContent = "Eliminar ticket";
+  btnEleminar.addEventListener("click", () => eliminarTicket(t.id));
+
+  headerRow.appendChild(spanPartido);
+  headerRow.appendChild(btnEleminar);
+
+  //!detalles//
+  const details = document.createElement("div");
+  details.className = "ticket-details";
+  details.appendChild = creardetalle("👤", t.nombre);
+  details.appendChild = creardetalle("📅", `${fecha} ⏰ ${t.horario}`);
+
+  details.appendChild(crearDetalle("🏟️", t.estadio));
+  details.appendChild(crearDetalle("💳", t.pago));
+  if (t.email) details.appendChild(crearDetalle("✉️", t.email));
+  details.appendChild(crearSubtotal(t));
+
+  item.appendChild(headerRow);
+  item.appendChild(details);
+  return item;
+}
+
+function crearPanelVacio() {
+  const panel = document.createElement("div");
+  panel.className = "panel";
+
+  const header = document.createElemt("div");
+  header.className = "panel-header";
+  header.textContent = "mis tickets";
+
+  const empty = document.createElement("div");
+  empty.className = "empty-state";
+
+  const icon = document.createElement("div");
+  icon.className = "empty-icon";
+  icon.textContent = "🎟️";
+
+  const p1 = document.createElement("p");
+  p1.textContent = "No has comprado ningún ticket aún.";
+
+  const p2 = document.crearteElement("p");
+  p2.className = "empty-hint";
+  p2.textContent = "completa el formulario para agregar";
+
+  empty.appendChild(icon);
+  empty.appendChild(p1);
+  empty.appendChild(p2);
+  panel.appendChild(header);
+  panel.appendChild(empty);
+  return panel;
+}
+
+function crearPanelTickets() {
+  const panel = document.createElement("div");
+  panel.className = "panel";
+
+  // Encabezado con contador
+  const header = document.createElement("div");
+  header.className = "panel-header";
+  header.append("mis tickets ");
+
+  const count = document.createElement("span");
+  count.className = "ticket-count";
+  count.textContent = tickets.length;
+  header.appendChild(count);
+
+  // Lista de tickets
+  const list = document.createElement("div");
+  list.className = "ticket-list";
+  tickets.forEach((t) => list.appendChild(crearItemTicket(t)));
+
+  // Fila de total
+  const totalRow = document.createElement("div");
+  totalRow.className = "ticket-total";
+
+  const label = document.createElement("span");
+  label.textContent = "total a pagar";
+
+  const amount = document.createElement("span");
+  amount.className = "total-amount";
+  amount.textContent = formatPrecio(total);
+
+  totalRow.appendChild(label);
+  totalRow.appendChild(amount);
+
+  // Botón limpiar todo
+  const btnLimpiar = document.createElement("button");
+  btnLimpiar.className = "btn btn-danger";
+  btnLimpiar.textContent = "🗑️ limpiar todo";
+  btnLimpiar.addEventListener("click", handleLimpiarTodo);
+
+  panel.appendChild(header);
+  panel.appendChild(list);
+  panel.appendChild(totalRow);
+  panel.appendChild(btnLimpiar);
+  return panel;
+}
+
+// ==================== RENDER ====================
+function render() {
+  total = tickets.reduce((acc, t) => acc + t.precio * t.cantidad, 0);
+  guardarEstado();
+
+  const container = document.getElementById("ticket-container");
+  const panel = tickets.length === 0 ? crearPanelVacio() : crearPanelTickets();
+  container.replaceChildren(panel); // reemplaza sin innerHTML
+}
+
+// ==================== COMPRAR ====================
 function handleComprar() {
-  mostrarError();
+  limpiarErrores();
+
   const nombre = val("inp-nombre").trim();
   const fecha = val("inp-fecha");
   const horario = val("inp-horario");
   const partido = val("inp-partido");
-  const precio = parseFloat(val("inp-precio"));
-  const cantidad = parseInt(val("inp-cantidad"));
+  const precioRaw = val("inp-precio");
+  const precio = parseFloat(precioRaw);
+  const cantidadRaw = val("inp-cantidad");
+  const cantidad = parseInt(cantidadRaw);
+  const estadio = val("inp-estadio");
+  const pago = val("inp-pago");
+  const email = val("inp-email").trim();
+
   let error = false;
 
-  if (isNaN(cantidad) || cantidad <= 0) {
-    mostrarError("err-cantidad", "cantidad inválida");
-    error = true;
-  } else if (cantidad > 10) {
-    mostrarError("err-cantidad", "cantidad no puede ser mayor a 10");
+  if (!nombre) {
+    mostrarError("err-nombre", "nombre requerido");
     error = true;
   }
-
-  if (isNaN(cantidad) || cantidad < 0) {
-    showToast("cantidad invalida");
-    return;
-  }
-
-  if (isNaN(cantidad) || cantidad < 1) {
-    showToast("cantidad invalida");
-    return;
-  }
-
   if (!fecha) {
     mostrarError("err-fecha", "fecha requerida");
     error = true;
-  } else if (ticket.some((t) => t.id === fecha)) {
-    mostrarError("err-fecha", "fecha " + fecha + " ya existe");
-    error = true;
   }
-
   if (!horario) {
     mostrarError("err-horario", "horario requerido");
     error = true;
   }
-
   if (!partido) {
     mostrarError("err-partido", "partido requerido");
     error = true;
   }
-
-  if (!precio) {
+  if (!precioRaw) {
     mostrarError("err-precio", "precio requerido");
     error = true;
   }
+  if (!estadio) {
+    mostrarError("err-estadio", "estadio requerido");
+    error = true;
+  }
+  if (!pago) {
+    mostrarError("err-pago", "método de pago requerido");
+    error = true;
+  }
+
+  if (!cantidadRaw || isNaN(cantidad) || cantidad < 1) {
+    mostrarError("err-cantidad", "cantidad inválida (mín. 1)");
+    error = true;
+  } else if (cantidad > 10) {
+    mostrarError("err-cantidad", "máximo 10 tickets por compra");
+    error = true;
+  }
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@] +$/.test(email)) {
+    mostrarError("err-email", "correo electrónico inválido");
+    error = true;
+  }
+
   if (error) return;
 
-  cantidadtickets = ticket(Compradadas, { id: ticket.id });
+  tickets.push({
+    id: Date.now().toString(),
+    nombre,
+    fecha,
+    horario,
+    partido,
+    precio,
+    cantidad,
+    estadio,
+    pago,
+    email,
+  });
   render();
-  showToast("ticket comprado");
+  showToast(`✅ ${cantidad} ticket(s) para ${partido} comprado(s)`);
+
   [
     "inp-nombre",
     "inp-fecha",
     "inp-horario",
     "inp-partido",
     "inp-precio",
-  ].forEach((id) => (document.getElementById(id).value = ""));
-  (id) => (document.getElementById(id).value = "");
-  document.getElementById("inp-id").focus();
-
-  render();
-  showToast("ticket comprado");
+    "inp-cantidad",
+    "inp-estadio",
+    "inp-pago",
+    "inp-email",
+  ].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("inp-nombre").focus();
 }
 
-//eleminar ticket
+// ==================== ELIMINAR ====================
 function handleEliminar(id) {
-  const ticketEliminado = ticket.find((t) => t.id === id);
-  ticket = eliminarTicket(ticket, id);
+  const t = tickets.find((t) => t.id === id);
+  if (!t) return;
+  tickets = tickets.filter((t) => t.id !== id);
   render();
-  showToast("ticket eliminado");
+  showToast(`🗑️ ticket de ${t.partido} eliminado`, "error");
 }
 
-//enter en cualcuadro de texto para comprar ticket
-["inp-nombre", "inp-fecha", "inp-horario", "inp-partido", "inp-precio"].forEach(
-  (id) => {
-    document.getElementById(id).addEventListener("keypress", (e) => {
+function handleLimpiarTodo() {
+  if (!confirm("¿Seguro que quieres eliminar todos los tickets?")) return;
+  tickets = [];
+  total = 0;
+  guardarEstado();
+  render();
+  showToast("🗑️ todos los tickets fueron eliminados", "error");
+}
+
+// ==================== ENTER KEY ====================
+[
+  "inp-nombre",
+  "inp-fecha",
+  "inp-horario",
+  "inp-partido",
+  "inp-precio",
+  "inp-cantidad",
+  "inp-estadio",
+  "inp-pago",
+  "inp-email",
+].forEach((id) => {
+  const input = document.getElementById(id);
+  if (input)
+    input.addEventListener("keypress", (e) => {
       if (e.key === "Enter") handleComprar();
     });
-  },
-);
+});
 
+// ==================== INIT ====================
 cargarEstado();
 render();
