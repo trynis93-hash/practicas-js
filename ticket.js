@@ -1,5 +1,5 @@
 let tickets = [];
-let tickets = 0;
+let total = 0;
 
 //*ayuda//
 const val = (id) => document.getElementById(id)?.value ?? "";
@@ -62,7 +62,7 @@ function showToast(msg, tipo = "exito") {
 
 //*formato//
 function formatPrecio(valor) {
-  return "$" + number(valor).toLocaleString("es-CO");
+  return "$" + Number(valor).toLocaleString("es-CO");
 }
 
 //*CONSTRUCTORES DOM//
@@ -71,18 +71,18 @@ function crearDetalle(icono, texto) {
   div.className = "ticket-detail";
 
   const icon = document.createElement("span");
-  icon.className = "ticket-icon";
+  icon.className = "detail-icon";
   icon.textContent = icono;
 
   div.appendChild(icon);
-  div.appendChild(texto);
+  div.append(texto);
 
   return div;
 }
 
 function crearSubtotal(t) {
   const div = document.createElement("div");
-  div.className = "ticket-deatil ticket-subtotal";
+  div.className = "ticket-detail ticket-subtotal";
 
   const icon = document.createElement("span");
   icon.className = "detail-icon";
@@ -92,7 +92,7 @@ function crearSubtotal(t) {
   strong.textContent = formatPrecio(t.precio * t.cantidad);
 
   div.appendChild(icon);
-  div.appendChild(`${t.cantidad} ticket(s) x ${formatPrecio(t.precio)} = `);
+  div.append(`${t.cantidad} ticket(s) x ${formatPrecio(t.precio)} = `);
   div.appendChild(strong);
 
   return div;
@@ -113,8 +113,9 @@ function crearItemTicket(t) {
 
   const btnEleminar = document.createElement("button");
   btnEleminar.className = "btn-eliminar";
-  btnEleminar.textContent = "Eliminar ticket";
-  btnEleminar.addEventListener("click", () => eliminarTicket(t.id));
+  btnEleminar.textContent = "x";
+  btnEleminar.title = "Eliminar ticket";
+  btnEleminar.addEventListener("click", () => handleEliminar(t.id));
 
   headerRow.appendChild(spanPartido);
   headerRow.appendChild(btnEleminar);
@@ -122,8 +123,8 @@ function crearItemTicket(t) {
   //!detalles//
   const details = document.createElement("div");
   details.className = "ticket-details";
-  details.appendChild = creardetalle("👤", t.nombre);
-  details.appendChild = creardetalle("📅", `${fecha} ⏰ ${t.horario}`);
+  details.appendChild(crearDetalle("👤", t.nombre));
+  details.appendChild(crearDetalle("📅", `${t.fecha} ⏰ ${t.horario}`));
 
   details.appendChild(crearDetalle("🏟️", t.estadio));
   details.appendChild(crearDetalle("💳", t.pago));
@@ -139,7 +140,7 @@ function crearPanelVacio() {
   const panel = document.createElement("div");
   panel.className = "panel";
 
-  const header = document.createElemt("div");
+  const header = document.createElement("div");
   header.className = "panel-header";
   header.textContent = "mis tickets";
 
@@ -153,7 +154,7 @@ function crearPanelVacio() {
   const p1 = document.createElement("p");
   p1.textContent = "No has comprado ningún ticket aún.";
 
-  const p2 = document.crearteElement("p");
+  const p2 = document.createElement("p");
   p2.className = "empty-hint";
   p2.textContent = "completa el formulario para agregar";
 
@@ -198,6 +199,13 @@ function crearPanelTickets() {
   totalRow.appendChild(label);
   totalRow.appendChild(amount);
 
+  const btnImprimir = document.createElement("button");
+  btnImprimir.className = "btn btn-imprimir";
+  btnImprimir.textContent = "🖨️ imprimir tickets";
+  btnImprimir.addEventListener("click", () => {
+    window.print();
+  });
+
   // Botón limpiar todo
   const btnLimpiar = document.createElement("button");
   btnLimpiar.className = "btn btn-danger";
@@ -207,21 +215,22 @@ function crearPanelTickets() {
   panel.appendChild(header);
   panel.appendChild(list);
   panel.appendChild(totalRow);
+  panel.appendChild(btnImprimir);
   panel.appendChild(btnLimpiar);
   return panel;
 }
 
-// ==================== RENDER ====================
+//*render//
 function render() {
   total = tickets.reduce((acc, t) => acc + t.precio * t.cantidad, 0);
   guardarEstado();
 
   const container = document.getElementById("ticket-container");
   const panel = tickets.length === 0 ? crearPanelVacio() : crearPanelTickets();
-  container.replaceChildren(panel); // reemplaza sin innerHTML
+  container.replaceChildren(panel);
 }
 
-// ==================== COMPRAR ====================
+//!error//
 function handleComprar() {
   limpiarErrores();
 
@@ -276,7 +285,7 @@ function handleComprar() {
     error = true;
   }
 
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@] +$/.test(email)) {
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     mostrarError("err-email", "correo electrónico inválido");
     error = true;
   }
@@ -314,7 +323,7 @@ function handleComprar() {
   document.getElementById("inp-nombre").focus();
 }
 
-// ==================== ELIMINAR ====================
+//?eliminar//
 function handleEliminar(id) {
   const t = tickets.find((t) => t.id === id);
   if (!t) return;
@@ -332,7 +341,7 @@ function handleLimpiarTodo() {
   showToast("🗑️ todos los tickets fueron eliminados", "error");
 }
 
-// ==================== ENTER KEY ====================
+//?ENTER KEY//
 [
   "inp-nombre",
   "inp-fecha",
@@ -351,6 +360,6 @@ function handleLimpiarTodo() {
     });
 });
 
-// ==================== INIT ====================
+//!init//
 cargarEstado();
 render();
